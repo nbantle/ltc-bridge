@@ -92,7 +92,7 @@ final class MTCEngine {
         get { lock.lock(); defer { lock.unlock() }; return _offsetFrames }
         set {
             lock.lock()
-            if running { anchorFrame += Double(newValue - _offsetFrames); generation += 1 }
+            if running, newValue != _offsetFrames { anchorFrame += Double(newValue - _offsetFrames); generation += 1 }
             _offsetFrames = newValue
             lock.unlock()
         }

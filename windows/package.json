@@ -1,0 +1,21 @@
+{
+  "name": "ltc-bridge",
+  "productName": "LTC Bridge",
+  "version": "1.9.1",
+  "description": "Converts SMPTE LTC (e.g. from Dante) to MIDI timecode for lighting software.",
+  "author": "Nate Bantle",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/selftest.mjs",
+    "package:win": "electron-packager . \"LTC Bridge\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icon.ico --ignore=^/dist --ignore=^/test --ignore=^/.gitignore --app-copyright=\"Nate Bantle\"",
+    "package:mac": "electron-packager . \"LTC Bridge\" --platform=darwin --arch=arm64 --out=dist --overwrite --ignore=^/dist --ignore=^/test"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.4.5"
+  }
+}

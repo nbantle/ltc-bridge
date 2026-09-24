@@ -12,6 +12,9 @@ Ableton (LTC audio) → Dante network → Dante Virtual Soundcard → LTC Bridge
 It can send to several places at once: IAC buses, network MIDI sessions (to other Macs)
 and Art-Net timecode over the network.
 
+**Windows:** there's also a Windows version with the same features and design. See
+section 13, [Windows version](#13-windows-version).
+
 ---
 
 ## Contents
@@ -27,6 +30,7 @@ and Art-Net timecode over the network.
 10. Tips for show use
 11. Limitations and known issues
 12. Building from source
+13. Windows version
 
 ---
 
@@ -436,3 +440,79 @@ Code layout:
 - `Tools/RenderUI/`: renders the window in each status to PNGs, for design review
 - `Tools/TransitionTest/`: opens the window, switches views and measures the animation
   (top edge fixed, frame timing)
+- `Tools/MTCMonitor/`: creates a private MIDI port and reports the MTC that arrives
+  (spacing, jitter, order, decoded timecode). Used to check both the Mac and Windows apps
+  without sending test timecode into real IAC buses.
+- `windows/`: the Windows version (section 13).
+
+---
+
+## 13. Windows version
+
+LTC Bridge for Windows (Windows 10 or 11, 64-bit) has the same engine, features and look
+as the Mac app: status colors, Timecode and Routing views, Send to list, Art-Net, test
+generator, signal history, loop protection and diagnostics. It's built with Electron.
+The differences:
+
+| | macOS | Windows |
+|---|---|---|
+| MIDI port between apps | IAC bus (built into macOS) | **loopMIDI** port (free add-on) |
+| Status light | menu bar dot | tray icon (bottom-right of the taskbar) |
+| Closing the window | keeps running; reopen from menu bar or Dock | keeps running; reopen from the tray icon |
+| Quit | ⌘Q or menu bar menu | tray icon menu → **Quit LTC Bridge** |
+| Keyboard | ⌘1 / ⌘2 switch views | Ctrl+1 / Ctrl+2 |
+
+### Installing on Windows
+1. Download **LTC-Bridge-1.9.1-Windows-x64.zip** from the GitHub release and unzip it
+   (right-click → **Extract All**). Keep the **LTC Bridge** folder together, for example in
+   `C:\Program Files\LTC Bridge` or your Documents folder.
+2. Double-click **LTC Bridge.exe**. Windows SmartScreen may say "Windows protected your
+   PC", because the app isn't signed by a registered developer. Click **More info →
+   Run anyway**. You only need to do this once.
+3. If Windows asks about microphone access, allow it. If the app shows the permission
+   warning, open **Settings → Privacy & security → Microphone** and turn on
+   **Let desktop apps access your microphone**.
+4. If you use Art-Net and Windows Firewall asks, allow LTC Bridge on your lighting
+   network.
+5. Optional: right-click **LTC Bridge.exe → Send to → Desktop (create shortcut)**, and tick
+   **Open at login** in the app.
+
+### Sending MTC to Vista on the same PC (loopMIDI)
+Windows has no built-in equivalent of the Mac's IAC bus, so install **loopMIDI** (free, by
+Tobias Erichsen). The **Get loopMIDI** link under **Send to** opens its web page.
+1. Install and open loopMIDI. Type a name such as *Timecode* and click **+**. Set loopMIDI
+   to start with Windows (its tray icon menu), so the port always exists.
+2. In LTC Bridge, tick that loopMIDI port under **MTC Output → Send to**. It's labeled
+   **LOOPBACK**.
+3. In Vista, choose the same loopMIDI port as the MIDI timecode input.
+
+On recent Windows 11 builds with *Windows MIDI Services*, its built-in loopback ports
+work the same way.
+
+### Dante Virtual Soundcard on Windows
+- LTC Bridge reads audio through Windows' standard audio system (WDM/WASAPI), not ASIO.
+  In Dante Virtual Soundcard, use **WDM** mode, or ASIO + WDM if your version offers it.
+- For the most reliable result, route the LTC to **DVS receive channel 1 or 2**. Windows
+  apps don't always get access to more than the first channels of a multichannel device.
+  If the Channel list shows fewer channels than DVS has, that's why.
+- Set the Dante sample rate and the Windows sound settings for the DVS device to the same
+  rate (usually 48 kHz).
+
+### Building the Windows version
+The Windows code is in `windows/`. Its timecode engine is a JavaScript port of
+`Sources/Core` with the same self-test. From the `windows` folder:
+
+```bash
+npm install
+npm test
+npm run package:win
+```
+
+`npm test` runs the self-test (decoder, timecode math, lock and jitter handling, loop
+protection, test generator, Art-Net, and the real LTC file if the Ableton drive is
+connected). `npm run package:win` builds `dist/LTC Bridge-win32-x64` (it can run on a Mac;
+Electron downloads its Windows runtime). `npm start` runs the app on the Mac for testing.
+
+It was tested on macOS in its packaged form. MTC sent to a private test port
+had quarter-frames within 0.03 ms of their correct spacing. It hasn't yet been run on a Windows PC.
+

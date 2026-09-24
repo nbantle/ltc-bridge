@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+  <title>LTC Bridge</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body class="mode-routing st-nosignal">
+  <header id="header">
+    <div id="topbar">
+      <span class="app-name">LTC Bridge</span>
+      <span class="spacer"></span>
+      <button id="pin" class="pin" title="Keep window on top" aria-pressed="false">
+        <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M9.8 1.5l4.7 4.7-1.4.4-2.6 2.6.3 3.2-1.1 1.1-2.8-2.8-3.6 3.6-.7-.7 3.6-3.6L3.4 7.2l1.1-1.1 3.2.3 2.6-2.6z" fill="currentColor"/></svg>
+      </button>
+      <div class="pill-switch" id="viewSwitch" role="tablist">
+        <button data-mode="timecode" role="tab">Timecode</button>
+        <button data-mode="routing" role="tab">Routing</button>
+      </div>
+    </div>
+    <div id="tcCard" class="tc-card">
+      <div id="tc" class="tc">--:--:--:--</div>
+      <div class="tc-sub">
+        <span id="statusPill" class="status-pill">NO SIGNAL</span>
+        <span id="rate" class="rate">—</span>
+        <span id="loopNote" class="loop-note" hidden>Input repeating: ignored</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="routing">
+    <div id="routingInner">
+      <div class="cards-row">
+        <section class="card">
+          <h2><span class="icon">≋</span> LTC INPUT</h2>
+          <div class="row"><label for="device">Device</label><select id="device"></select></div>
+          <div class="row"><label for="channel">Channel</label><select id="channel"></select></div>
+          <div class="row"><label>Level</label><div id="meter" class="meter"></div></div>
+          <div class="row"><label>LTC in</label><span id="rawLTC" class="raw">—</span><span id="inputMessage" class="note right"></span></div>
+        </section>
+        <div class="wire" aria-hidden="true"><span class="wire-track"><span class="wire-dash"></span></span><span class="wire-label">MTC</span></div>
+        <section class="card">
+          <h2><span class="icon">♪</span> MTC OUTPUT</h2>
+          <div class="row top"><label>Send to</label>
+            <div class="send-list">
+              <div id="outputs"></div>
+              <button id="midiSetup" class="link"></button>
+            </div>
+          </div>
+          <div class="row top"><label for="artnet">Art-Net</label>
+            <div class="stack">
+              <select id="artnet"></select>
+              <input id="artnetIP" type="text" placeholder="192.168.1.50" spellcheck="false" hidden>
+            </div>
+          </div>
+          <div class="row"><label for="offset">Offset</label><input id="offset" class="mono short" type="text" spellcheck="false"></div>
+          <div class="row"><label for="freewheel">Freewheel</label>
+            <span class="stepper"><button id="fwDown" aria-label="Fewer frames">−</button><span id="freewheel">10 frames</span><button id="fwUp" aria-label="More frames">+</button></span>
+          </div>
+        </section>
+      </div>
+
+      <section class="card wide">
+        <h2><span class="icon">▮</span> SIGNAL HISTORY <span class="dim">· last 5 min</span><span class="spacer"></span><span id="dropouts" class="dropouts">No dropouts</span></h2>
+        <canvas id="history" height="30"></canvas>
+        <div class="axis"><span>now</span><span>5 min ago</span></div>
+      </section>
+
+      <div class="bottom-row">
+        <section class="card grow">
+          <h2><span class="icon">▶</span> TEST GENERATOR</h2>
+          <div class="row"><label for="testStart">Start at</label><input id="testStart" class="mono short" type="text" spellcheck="false"></div>
+          <div class="row"><label>Rate</label><div class="pill-switch" id="testRate"></div></div>
+          <div class="row"><button id="testButton" class="test-button">▶ Start Test</button><span class="note">Sends MTC without Ableton. Incoming LTC is ignored while running.</span></div>
+        </section>
+        <section class="card app-card">
+          <h2><span class="icon">⚙</span> APP</h2>
+          <label class="check"><input id="login" type="checkbox"> Open at login</label>
+          <p class="note">Closing the window keeps timecode running. Reopen it from the tray icon; quit from the tray menu.</p>
+        </section>
+      </div>
+
+      <div id="warnings"></div>
+
+      <div class="footer">
+        <span id="footerText" class="note"></span>
+        <button id="saveDiag" class="small">Save Diagnostics</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

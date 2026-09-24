@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP="build/LTC Bridge.app"
-VERSION="1.9"
+VERSION="1.9.1"
 SOURCES=(Sources/Core/*.swift Sources/App/*.swift)
 
 mkdir -p build
